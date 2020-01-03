@@ -17,3 +17,4 @@ logs/
 *.xlsx
 *.csv
 tmp
+**/*.d.ts
