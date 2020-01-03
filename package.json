@@ -1,0 +1,45 @@
+{
+  "name": "@pagodas/excel-write-stream",
+  "dependencies": {
+    "@types/readable-stream": "^2.3.5",
+    "duplexer2": "^0.1.4",
+    "exceljs": "^3.4.0",
+    "readable-stream": "^3.4.0"
+  },
+  "main": "index.js",
+  "types": "index.d.ts",
+  "typings": "index.d.ts",
+  "devDependencies": {
+    "typescript": "^3.1.6",
+    "mocha": "5.2.0",
+    "@types/mocha": "5.2.0",
+    "@types/node": "8.10.0",
+    "multipipe": "^3.0.1",
+    "through2": "^3.0.1",
+    "tslint": "^5.0.0"
+  },
+  "scripts": {
+    "lint": "tslint --project . -c tslint.json",
+    "tsc": "tsc -p tsconfig.json",
+    "test": "npm run tsc&& mocha ./test --recursive --exit",
+    "clean": "find .|grep -v -E '\\./(node_modules|typing)/.*$'|grep -E '.*\\.(d\\.ts|js)$'|xargs rm"
+  },
+  "version": "0.0.1",
+  "description": "Create excel rows write stream.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chianquan/excel-write-stream.git"
+  },
+  "keywords": [
+    "pagodas",
+    "excel",
+    "stream",
+    "write"
+  ],
+  "author": "chianquan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chianquan/excel-write-stream/issues"
+  },
+  "homepage": "https://github.com/chianquan/excel-write-stream#readme"
+}

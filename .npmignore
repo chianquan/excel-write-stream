@@ -1,0 +1,8 @@
+**/*.ts
+!**/*.d.ts
+.idea
+.env
+.nyc_output
+.vscode
+tmp
+*.xlsx
