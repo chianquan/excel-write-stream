@@ -55,7 +55,7 @@ import stream = require('readable-stream');
     combine(new TestRowsStream(), excelDuplex, outFile, done);
 ```
 
-An demo that support more features.
+A demo that support more features.
 
 ```js
 import {createExcelWriterDuplex, ExcelWriterCellInput} from '../index';
