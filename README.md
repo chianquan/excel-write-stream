@@ -19,8 +19,8 @@ import path = require('path');
 import combine = require('multipipe');
 import stream = require('readable-stream');
 
-// an readstream that have 100 rows .
-class TestRowsStream extends stream.Readable {
+    // an readstream that have 100 rows.
+    class TestRowsStream extends stream.Readable {
       private i = 0;
 
       constructor() {
@@ -31,9 +31,9 @@ class TestRowsStream extends stream.Readable {
         if (this.i > 100) {
           this.push(null);
         } else {
-          this.push([// mention an array values.
-            `first value${this.i}`,
-            this.i,
+          this.push([ // row can be array of literal value.
+            `first value${this.i}`,// string
+            this.i,//number
             `third value${this.i}`,
           ]);
           this.i++;
@@ -42,15 +42,17 @@ class TestRowsStream extends stream.Readable {
     }
 
     const excelDuplex = createExcelWriterDuplex({
-      columns: [// table header name values
+      columns: [// columns can be string[].
         'first row',
         'second row',
         'third',
       ],
     });
+    // create an file write stream.
     const outFile = fs.createWriteStream(path.join(__dirname, './easy_data.xlsx'));
-    combine(new TestRowsStream(), excelDuplex, outFile, done);
 
+    // pipe the row read stream to excelDuplex, pipe the excelDuplex to file write stream.
+    combine(new TestRowsStream(), excelDuplex, outFile, done);
 ```
 
 An demo that support more features.
