@@ -13,7 +13,7 @@ $ npm i @pagodas/excel-write-stream --save
 ## Usage
 
 ```js
-import {createExcelWriterDuplex, ExcelWriterCellInput} from '../index';
+import {createExcelWriterDuplex, ExcelWriterCellInput} from '@pagodas/excel-write-stream';
 import fs = require('fs');
 import path = require('path');
 import combine = require('multipipe');
@@ -58,7 +58,7 @@ import stream = require('readable-stream');
 A demo that support more features.
 
 ```js
-import {createExcelWriterDuplex, ExcelWriterCellInput} from '../index';
+import {createExcelWriterDuplex, ExcelWriterCellInput} from '@pagodas/excel-write-stream';
 import fs = require('fs');
 import path = require('path');
 import combine = require('multipipe');
