@@ -117,3 +117,13 @@ class TestRowsStream extends stream.Readable {
     const outFile = fs.createWriteStream(path.join(__dirname, './a.xlsx'));
     combine(new TestRowsStream(), excelDuplex, outFile, done);
 ```
+
+
+
+## Questions & Suggestions
+
+Please open an issue [here](https://github.com/chianquan/excel-write-stream/issues).
+
+## License
+
+[MIT](LICENSE)
