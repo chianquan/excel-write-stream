@@ -6,3 +6,6 @@
 .vscode
 tmp
 *.xlsx
+test
+tsconfig.json
+tslint.json

@@ -94,6 +94,26 @@ class ExcelWrite extends stream.Writable {
     } as Borders;
   }
 
+  private newSheet() {
+    if (this.currentSheet) {
+      this.currentSheet.commit();
+    }
+    const sheetOption: { [key: string]: any } = {};
+    if (this.fixHeader) {
+      sheetOption.views = [
+        {state: 'frozen', xSplit: 0, ySplit: 1},
+      ];
+    }
+    this.currentSheet = this.wb.addWorksheet(
+      this.sheetNameFun(Math.floor(this.rowId / this.rowsPerPage) + 1),
+      sheetOption,
+    );
+    this.currentSheet.columns = this.columns;
+    this.currentSheet.getRow(1).eachCell((cell) => {
+      cell.border = this.getBorders();
+    });
+  }
+
   getReadable() {
     return this._readable;
   }
@@ -108,24 +128,7 @@ class ExcelWrite extends stream.Writable {
         }
       });
       if (this.rowId % this.rowsPerPage === 0) {
-        if (this.currentSheet) {
-          this.currentSheet.commit();
-        }
-        const sheetOption: { [key: string]: any } = {};
-        if (this.fixHeader) {
-          sheetOption.views = [
-            {state: 'frozen', xSplit: 0, ySplit: 1},
-          ];
-        }
-        this.currentSheet = this.wb.addWorksheet(
-          this.sheetNameFun(Math.floor(this.rowId / this.rowsPerPage) + 1),
-          sheetOption,
-        );
-        console.log(JSON.stringify(this.columns));
-        this.currentSheet.columns = this.columns;
-        this.currentSheet.getRow(1).eachCell((cell) => {
-          cell.border = this.getBorders();
-        });
+        this.newSheet();
       }
       const rowObj = this.currentSheet.addRow(row.map(({value}) => value));
 
@@ -184,9 +187,10 @@ class ExcelWrite extends stream.Writable {
 
   async end(...args) {
     (async () => {
-      if (this.currentSheet) {
-        this.currentSheet.commit();
+      if (!this.currentSheet) {
+        this.newSheet(); // ensure at least 1 worksheet.
       }
+      this.currentSheet.commit();
       await this.wb.commit();
       super.end(...args);
       this._readable.end();
