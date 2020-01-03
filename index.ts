@@ -130,7 +130,9 @@ class ExcelWrite extends stream.Writable {
       if (this.rowId % this.rowsPerPage === 0) {
         this.newSheet();
       }
-      const rowObj = this.currentSheet.addRow(row.map(({value}) => value));
+      const rowObj = this.currentSheet.addRow(row.map(({value}) => {
+        return value === null || value === undefined ? '' : value;
+      }));
 
       rowObj.eachCell((cell, colNumber) => {
 
