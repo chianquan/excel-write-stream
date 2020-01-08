@@ -4,6 +4,8 @@
     "@types/readable-stream": "^2.3.5",
     "duplexer2": "^0.1.4",
     "exceljs": "^3.4.0",
+    "lodash.map": "^4.6.0",
+    "lodash.repeat": "^4.1.0",
     "readable-stream": "^3.4.0"
   },
   "main": "index.js",
@@ -24,7 +26,7 @@
     "test": "npm run tsc&& mocha ./test --recursive --exit",
     "clean": "find .|grep -v -E '\\./(node_modules|typing)/.*$'|grep -E '.*\\.(d\\.ts|js)$'|xargs rm"
   },
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Create excel rows write stream.",
   "repository": {
     "type": "git",

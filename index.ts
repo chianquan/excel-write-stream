@@ -2,6 +2,11 @@ import duplexer2 = require('duplexer2');
 import Excel = require('exceljs');
 import {Border, Borders, Column, Worksheet} from 'exceljs';
 import stream = require('readable-stream');
+import colCache = require('exceljs/lib/utils/col-cache');
+import repeat = require('lodash.repeat');
+import map = require('lodash.map');
+
+const symbolConfigsSymbol = Symbol('symbols config for current sheet.');
 
 export interface ExcelWriterStreamOptions {
   columns: Array<Partial<Column> | string>;
@@ -17,6 +22,7 @@ export interface ExcelWriterCellInput {
   numberFormat?: string;
   background?: string;
   customFun?: (cell: Excel.Cell) => void;
+  symbol?: [string, number];
 }
 
 export function createExcelWriterDuplex(opt: ExcelWriterStreamOptions) {
@@ -29,6 +35,33 @@ export const excelJs = Excel;
 
 const excelMaxRow = 1_048_576;
 const rgbRegx = /^[0-9a-f]{6}$/i;
+
+export interface SymbolConfig {
+  row: number;
+  column: number;
+  iconSet: string;
+  index: number;
+}
+
+export const iconSetTypes = [
+  '3Arrows',
+  '3ArrowsGray',
+  '3Flags',
+  '3TrafficLights1',
+  '3TrafficLights2',
+  '3Signs',
+  '3Symbols',
+  '3Symbols2',
+  '4Arrows',
+  '4ArrowsGray',
+  '4RedToBlack',
+  '4Rating',
+  '4TrafficLights',
+  '5Arrows',
+  '5ArrowsGray',
+  '5Rating',
+  '5Quarters',
+];
 
 class ExcelWrite extends stream.Writable {
   private readonly columns: Array<Partial<Column>>;
@@ -108,10 +141,26 @@ class ExcelWrite extends stream.Writable {
       this.sheetNameFun(Math.floor(this.rowId / this.rowsPerPage) + 1),
       sheetOption,
     );
+    this.currentSheet[symbolConfigsSymbol] = [];
     this.currentSheet.columns = this.columns;
     this.currentSheet.getRow(1).eachCell((cell) => {
       cell.border = this.getBorders();
     });
+    const oldWriteCloseSheetDataFun = (this.currentSheet as any)._writeCloseSheetData;
+    if (typeof oldWriteCloseSheetDataFun === 'function') {
+      (this.currentSheet as any)._writeCloseSheetData = function (this: Worksheet) {
+        oldWriteCloseSheetDataFun.apply(this);
+        // @ts-ignore
+        const symbolConfigs: SymbolConfig[] = this[symbolConfigsSymbol];
+        (this as any)._write(symbolConfigs.map(({row, column, iconSet, index}) => {
+          const cellRef = colCache.n2l(column) + row;
+          const setLen = iconSet && parseInt(iconSet[0], 10) || 3;
+          const hundredPercentLen = setLen > index ? index : setLen - 1;
+          const zeroPercentLen = setLen - hundredPercentLen;
+          return `<conditionalFormatting sqref="${cellRef}"><cfRule type="iconSet" priority="1"><iconSet iconSet="${iconSet}">${repeat('<cfvo type="percent" val="0"/>', zeroPercentLen)}${repeat('<cfvo type="percent" val="100" gte="0"/>', hundredPercentLen)}</iconSet></cfRule></conditionalFormatting>`;
+        }).join(''));
+      };
+    }
   }
 
   getReadable() {
@@ -147,7 +196,7 @@ class ExcelWrite extends stream.Writable {
           };
         }
 
-        const {numberFormat, background, customFun} = row[colNumber - 1] || {} as ExcelWriterCellInput;
+        const {numberFormat, background, customFun, symbol} = row[colNumber - 1] || {} as ExcelWriterCellInput;
 
         //set numberFormat
         if (numberFormat) {
@@ -161,6 +210,20 @@ class ExcelWrite extends stream.Writable {
             pattern: 'solid',
             fgColor: {argb: `FF${background}`},
           };
+        }
+        if (symbol) {
+          const value = cell.value;
+          if (typeof value === 'string') {
+            cell.value = 0;
+            cell.numFmt = map(value, (c) => '\\' + c).join('');
+          }
+          (this.currentSheet[symbolConfigsSymbol] as SymbolConfig[]).push({
+            row: rowObj.number,
+            column: colNumber,
+            iconSet: symbol[0],
+            index: symbol[1],
+          });
+          // todo value string?
         }
 
         if (customFun) {
