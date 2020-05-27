@@ -63,7 +63,7 @@ export const iconSetTypes = [
   '5Quarters',
 ];
 
-class ExcelWrite extends stream.Writable {
+export class ExcelWrite extends stream.Writable {
   private readonly columns: Array<Partial<Column>>;
   private readonly wb: Excel.stream.xlsx.WorkbookWriter;
   private rowId: number = 0;

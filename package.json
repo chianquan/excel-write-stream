@@ -26,7 +26,7 @@
     "test": "npm run tsc&& mocha ./test --recursive --exit",
     "clean": "find .|grep -v -E '\\./(node_modules|typing)/.*$'|grep -E '.*\\.(d\\.ts|js)$'|xargs rm"
   },
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Create excel rows write stream.",
   "repository": {
     "type": "git",
